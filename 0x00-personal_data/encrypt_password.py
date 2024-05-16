@@ -4,7 +4,15 @@ import bcrypt
 
 
 def hash_password(password: str) -> bytes:
-    """doc doc doc"""
+    """
+    Hashes a password using bcrypt.
+
+    Args:
+        password (str): The password to hash.
+
+    Returns:
+        bytes: The hashed password.
+    """
     return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
 
 
