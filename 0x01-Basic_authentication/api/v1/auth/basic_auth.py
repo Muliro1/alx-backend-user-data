@@ -5,6 +5,7 @@ import re
 import base64
 import binascii
 from typing import Tuple, TypeVar
+
 from .auth import Auth
 from models.user import User
 
@@ -64,7 +65,7 @@ class BasicAuth(Auth):
             self,
             user_email: str,
             user_pwd: str) -> TypeVar('User'):
-        """Retrieves a user based on the user's authentiation credentials.
+        """Retrieves a user based on the user's authentication credentials.
         """
         if type(user_email) is str and type(user_pwd) is str:
             try:
