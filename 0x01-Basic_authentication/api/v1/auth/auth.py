@@ -15,12 +15,16 @@ class Auth:
         :return: True if the path is in
         the excluded_paths list, False otherwise
         """
-        if path is None or excluded_paths is None or len(excluded_paths) == 0:
+        if path is None:
             return True
-        if path[-1] != "/":
-            path += "/"
+        if excluded_paths is None or not excluded_paths:
+            return True
 
-        return path not in excluded_paths
+        for excluded_path in excluded_paths:
+            if fnmatch.fnmatch(path, excluded_path):
+                return False
+
+        return True
 
     def authorization_header(self, request=None) -> str:
         """
