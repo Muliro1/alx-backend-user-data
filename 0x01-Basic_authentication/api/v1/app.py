@@ -40,10 +40,12 @@ def before_request_func() -> None:
         # If the request does not require authentication, return
         return
     if auth.authorization_header(request) is None:
-        # If the request does not have an Authorization header, abort with a 401 status code
+        # If the request does not have an Authorization
+        # header, abort with a 401 status code
         abort(401)
     if auth.current_user(request) is None:
-        # If the request does not have a valid user, abort with a 403 status code
+        # If the request does not have a valid user,
+        # abort with a 403 status code
         abort(403)
 
 
