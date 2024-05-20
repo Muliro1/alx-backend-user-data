@@ -31,7 +31,15 @@ class Auth:
             return request.headers.get('Authorization', None)
         return None
 
+<<<<<<< HEAD
     def current_user(self, request=None) -> TypeVar('User'):
         """ Method to get user from request.
+=======
+    def current_user(self, request=None) -> TypeVar("User"):
+        """
+        Get the current user from the given request
+        :param request: the request object
+        :return: the current user
+>>>>>>> 707ed63 (n)
         """
         return None
