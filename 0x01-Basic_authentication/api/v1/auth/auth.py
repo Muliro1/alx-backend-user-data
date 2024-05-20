@@ -12,7 +12,8 @@ class Auth:
         Check if the given path is in the excluded paths list
         :param path: the path to check
         :param excluded_paths: the list of paths to exclude
-        :return: True if the path is in the excluded_paths list, False otherwise
+        :return: True if the path is in
+        the excluded_paths list, False otherwise
         """
         if path is None or excluded_paths is None or len(excluded_paths) == 0:
             return True
