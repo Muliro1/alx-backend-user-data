@@ -65,7 +65,7 @@ class BasicAuth(Auth):
             self,
             user_email: str,
             user_pwd: str) -> TypeVar('User'):
-        """Retrieves a user based on the user's authentication credentials.
+        """Retrieves a user based on the user's authentiation credentials.
         """
         if type(user_email) is str and type(user_pwd) is str:
             try:
