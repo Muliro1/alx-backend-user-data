@@ -16,13 +16,14 @@ class Auth:
     """
     def require_auth(self, path: str, excluded_paths: List[str]) -> bool:
         """
-        Determines whether a given path requires authentication or not
+        Determines whether a given path requires authentication or not.
+
         Args:
-            - path(str): Url path to be checked
-            - excluded_paths(List of str): List of paths that do not require
-              authentication
-        Return:
-            - True if path is not in excluded_paths, else False
+            path (str): Url path to be checked
+            excluded_paths (List of str): List of paths that do not require authentication
+
+        Returns:
+            bool: True if path is not in excluded_paths, else False
         """
         if path is None:
             return True
@@ -43,7 +44,13 @@ class Auth:
 
     def authorization_header(self, request=None) -> str:
         """
-        Returns the authorization header from a request object
+        Returns the authorization header from a request object.
+
+        Args:
+            request (flask.Request): Request object to be checked
+
+        Returns:
+            str: Value of the Authorization header from the request object
         """
         if request is None:
             return None
@@ -54,17 +61,25 @@ class Auth:
 
     def current_user(self, request=None) -> TypeVar('User'):
         """
-        Returns a User instance from information from a request object
+        Returns a User instance from information from a request object.
+
+        Args:
+            request (flask.Request): Request object to be checked
+
+        Returns:
+            User: User instance from the request object
         """
         return None
 
-    def session_cookie(self, request=None):
+    def session_cookie(self, request=None) -> str:
         """
-        Returns a cookie from a request
+        Returns a cookie from a request.
+
         Args:
-            request : request object
-        Return:
-            value of _my_session_id cookie from request object
+            request (flask.Request): Request object to be checked
+
+        Returns:
+            str: Value of the _my_session_id cookie from the request object
         """
         if request is None:
             return None

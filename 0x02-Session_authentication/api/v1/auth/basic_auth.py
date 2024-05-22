@@ -16,7 +16,13 @@ class BasicAuth(Auth):
                                             authorization_header: str) -> str:
         """
         Extracts the Base64 part of the Authorization header for a Basic
-        Authorization
+        Authorization.
+
+        Args:
+            authorization_header (str): The Authorization header from a request
+
+        Returns:
+            str: The extracted Base64 part of the Authorization header
         """
         if authorization_header is None:
             return None
@@ -31,7 +37,13 @@ class BasicAuth(Auth):
                                            base64_authorization_header:
                                            str) -> str:
         """
-        Decode a Base64-encoded string
+        Decode a Base64-encoded string.
+
+        Args:
+            base64_authorization_header (str): The Base64 part of the Authorization header
+
+        Returns:
+            str: The decoded Base64-encoded string
         """
         if base64_authorization_header is None:
             return None
@@ -48,7 +60,13 @@ class BasicAuth(Auth):
                                  decoded_base64_authorization_header:
                                  str) -> (str, str):
         """
-        Returns user email and password from Base64 decoded value
+        Returns user email and password from Base64 decoded value.
+
+        Args:
+            decoded_base64_authorization_header (str): The decoded Base64-encoded string
+
+        Returns:
+            (str, str): The extracted user email and password
         """
         if decoded_base64_authorization_header is None:
             return (None, None)
@@ -63,7 +81,14 @@ class BasicAuth(Auth):
     def user_object_from_credentials(self, user_email: str,
                                      user_pwd: str) -> TypeVar('User'):
         """
-        Return a User instance based on email and password
+        Return a User instance based on email and password.
+
+        Args:
+            user_email (str): The user email
+            user_pwd (str): The user password
+
+        Returns:
+            User: The User instance based on email and password
         """
         if user_email is None or not isinstance(user_email, str):
             return None
@@ -82,7 +107,13 @@ class BasicAuth(Auth):
 
     def current_user(self, request=None) -> TypeVar('User'):
         """
-        Returns a User instance based on a received request
+        Returns a User instance based on a received request.
+
+        Args:
+            request (flask.Request): The request object to be checked
+
+        Returns:
+            User: The User instance based on a received request
         """
         Auth_header = self.authorization_header(request)
         if Auth_header is not None:

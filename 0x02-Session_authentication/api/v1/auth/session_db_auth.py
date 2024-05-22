@@ -15,8 +15,12 @@ class SessionDBAuth(SessionExpAuth):
     def create_session(self, user_id=None):
         """
         Create a Session ID for a user_id
+
         Args:
-           user_id (str): user id
+            user_id (str): user id
+
+        Returns:
+            Session ID in string format or None if user_id is None or not a string
         """
         session_id = super().create_session(user_id)
         if not session_id:
@@ -32,20 +36,28 @@ class SessionDBAuth(SessionExpAuth):
     def user_id_for_session_id(self, session_id=None):
         """
         Returns a user ID based on a session ID
+
         Args:
             session_id (str): session ID
-        Return:
+
+        Returns:
             user id or None if session_id is None or not a string
         """
         user_id = UserSession.search({"session_id": session_id})
         if user_id:
-            return user_id
+            return user_id[0].user_id
         return None
 
     def destroy_session(self, request=None):
         """
         Destroy a UserSession instance based on a
         Session ID from a request cookie
+
+        Args:
+            request : request object containing cookie
+
+        Returns:
+            True if session is deleted, False otherwise
         """
         if request is None:
             return False
