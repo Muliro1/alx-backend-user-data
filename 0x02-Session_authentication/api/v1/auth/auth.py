@@ -14,35 +14,29 @@ class Auth:
     """
     Manages the API authentication
     """
-    def require_auth(self, path: str, excluded_paths: List[str]) -> bool:
+    def __init__(self, excluded_paths: List[str]):
+        self.excluded_paths = set(excluded_paths)
+
+    def require_auth(self, path: str) -> bool:
         """
         Determines whether a given path requires authentication or not.
 
         Args:
             path (str): Url path to be checked
-            excluded_paths (List of str): List of paths that do not require authentication
 
         Returns:
             bool: True if path is not in excluded_paths, else False
         """
         if path is None:
             return True
-        elif excluded_paths is None or excluded_paths == []:
-            return True
-        elif path in excluded_paths:
-            return False
-        else:
-            for i in excluded_paths:
-                if i.startswith(path):
-                    return False
-                if path.startswith(i):
-                    return False
-                if i[-1] == "*":
-                    if path.startswith(i[:-1]):
-                        return False
+        for excluded_path in self.excluded_paths:
+            if path.startswith(excluded_path):
+                return False
+            if excluded_path.endswith("*") and path.startswith(excluded_path[:-1]):
+                return False
         return True
 
-    def authorization_header(self, request=None) -> str:
+    def authorization_header(self, request: 'flask.Request') -> str:
         """
         Returns the authorization header from a request object.
 
@@ -52,14 +46,9 @@ class Auth:
         Returns:
             str: Value of the Authorization header from the request object
         """
-        if request is None:
-            return None
-        header = request.headers.get('Authorization')
-        if header is None:
-            return None
-        return header
+        return request.headers.get('Authorization')
 
-    def current_user(self, request=None) -> TypeVar('User'):
+    def current_user(self, request: 'flask.Request') -> TypeVar('User'):
         """
         Returns a User instance from information from a request object.
 
@@ -71,7 +60,7 @@ class Auth:
         """
         return None
 
-    def session_cookie(self, request=None) -> str:
+    def session_cookie(self, request: 'flask.Request') -> str:
         """
         Returns a cookie from a request.
 
@@ -81,7 +70,5 @@ class Auth:
         Returns:
             str: Value of the _my_session_id cookie from the request object
         """
-        if request is None:
-            return None
         session_name = os.getenv('SESSION_NAME')
         return request.cookies.get(session_name)
