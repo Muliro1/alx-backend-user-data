@@ -1,23 +1,20 @@
 #!/usr/bin/env python3
-"""doc doc doc """
-import fnmatch
-from typing import List, TypeVar
+"""Authentication module.
+"""
 from flask import request
+from typing import List, TypeVar
+import fnmatch
 
 
 class Auth:
-    """doc doc doc"""
-
+    """Authentication class.
+    """
     def require_auth(self, path: str, excluded_paths: List[str]) -> bool:
-        """
-        Check if the given path is in the excluded paths list
-        :param path: the path to check
-        :param excluded_paths: the list of paths to exclude
-        :return: True if the path is in
-        the excluded_paths list, False otherwise
+        """ Method to check if auth is required.
         """
         if path is None:
             return True
+
         if excluded_paths is None or not excluded_paths:
             return True
 
@@ -28,19 +25,21 @@ class Auth:
         return True
 
     def authorization_header(self, request=None) -> str:
+        """ Method to get authorization header.
         """
-        Get the value of the Authorization header from the given request
-        :param request: the request object
-        :return: the value of the Authorization header
-        """
-        if request is None:
-            return None
-        return request.headers.get("Authorization", None)
+        if request is not None:
+            return request.headers.get('Authorization', None)
+        return None
 
+<<<<<<< HEAD
+    def current_user(self, request=None) -> TypeVar('User'):
+        """ Method to get user from request.
+=======
     def current_user(self, request=None) -> TypeVar("User"):
         """
         Get the current user from the given request
         :param request: the request object
         :return: the current user
+>>>>>>> 707ed63 (n)
         """
         return None
