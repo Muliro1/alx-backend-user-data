@@ -11,19 +11,15 @@ from models.user import User
 
 
 class SessionAuth(Auth):
+    """ Implement Session Authorization protocol methods
     """
-    Implement Session Authorization protocol methods
-    """
-
     user_id_by_session_id = {}
 
     def create_session(self, user_id: str = None) -> str:
         """
-        Creates a Session ID for a user with id user_id.
-
+        Creates a Session ID for a user with id user_id
         Args:
             user_id (str): user's user id
-
         Return:
             None is user_id is None or not a string
             Session ID in string format
@@ -36,11 +32,9 @@ class SessionAuth(Auth):
 
     def user_id_for_session_id(self, session_id: str = None) -> str:
         """
-        Returns a user ID based on a session ID.
-
+        Returns a user ID based on a session ID
         Args:
             session_id (str): session ID
-
         Return:
             user id or None if session_id is None or not a string
         """
@@ -48,13 +42,11 @@ class SessionAuth(Auth):
             return None
         return self.user_id_by_session_id.get(session_id)
 
-    def current_user(self, request=None) -> User:
+    def current_user(self, request=None):
         """
-        Return a user instance based on a cookie value.
-
+        Return a user instance based on a cookie value
         Args:
             request : request object containing cookie
-
         Return:
             User instance
         """
@@ -63,15 +55,9 @@ class SessionAuth(Auth):
         user = User.get(user_id)
         return user
 
-    def destroy_session(self, request=None) -> bool:
+    def destroy_session(self, request=None):
         """
-        Deletes a user session.
-
-        Args:
-            request : request object containing cookie
-
-        Return:
-            True if session is deleted, False otherwise
+        Deletes a user session
         """
         if request is None:
             return False
