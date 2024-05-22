@@ -13,11 +13,15 @@ DATA = {}
 
 
 class Base():
-    """ Base class
+    """ Base class for all models
     """
-
     def __init__(self, *args: list, **kwargs: dict):
         """ Initialize a Base instance
+
+        Keyword arguments:
+        id (str): The ID of the instance
+        created_at (str): The timestamp of creation in the format %Y-%m-%dT%H:%M:%S
+        updated_at (str): The timestamp of last update in the format %Y-%m-%dT%H:%M:%S
         """
         s_class = str(self.__class__.__name__)
         if DATA.get(s_class) is None:
@@ -36,7 +40,9 @@ class Base():
             self.updated_at = datetime.utcnow()
 
     def __eq__(self, other: TypeVar('Base')) -> bool:
-        """ Equality
+        """ Compare two instances for equality
+
+        Two instances are equal if they have the same ID
         """
         if type(self) != type(other):
             return False
@@ -45,7 +51,11 @@ class Base():
         return (self.id == other.id)
 
     def to_json(self, for_serialization: bool = False) -> dict:
-        """ Convert the object a JSON dictionary
+        """ Convert the instance to a JSON dictionary
+
+        If for_serialization is True, all attributes are included
+        in the output. If False, only attributes without a leading
+        underscore are included
         """
         result = {}
         for key, value in self.__dict__.items():
@@ -59,7 +69,10 @@ class Base():
 
     @classmethod
     def load_from_file(cls):
-        """ Load all objects from file
+        """ Load all instances from file
+
+        The instances are loaded from a JSON file with the same name
+        as the class
         """
         s_class = cls.__name__
         file_path = ".db_{}.json".format(s_class)
@@ -74,7 +87,10 @@ class Base():
 
     @classmethod
     def save_to_file(cls):
-        """ Save all objects to file
+        """ Save all instances to file
+
+        The instances are saved to a JSON file with the same name
+        as the class
         """
         s_class = cls.__name__
         file_path = ".db_{}.json".format(s_class)
@@ -86,7 +102,10 @@ class Base():
             json.dump(objs_json, f)
 
     def save(self):
-        """ Save current object
+        """ Save the current instance
+
+        The instance is saved to the file and the updated_at
+        attribute is updated
         """
         s_class = self.__class__.__name__
         self.updated_at = datetime.utcnow()
@@ -94,7 +113,9 @@ class Base():
         self.__class__.save_to_file()
 
     def remove(self):
-        """ Remove object
+        """ Remove the current instance
+
+        The instance is removed from the file
         """
         s_class = self.__class__.__name__
         if DATA[s_class].get(self.id) is not None:
@@ -103,27 +124,35 @@ class Base():
 
     @classmethod
     def count(cls) -> int:
-        """ Count all objects
+        """ Count all instances
+
+        Return the number of instances
         """
         s_class = cls.__name__
         return len(DATA[s_class].keys())
 
     @classmethod
     def all(cls) -> Iterable[TypeVar('Base')]:
-        """ Return all objects
+        """ Return all instances
+
+        Return an iterable of all instances
         """
         return cls.search()
 
     @classmethod
     def get(cls, id: str) -> TypeVar('Base'):
-        """ Return one object by ID
+        """ Return one instance by ID
+
+        Return the instance with the given ID
         """
         s_class = cls.__name__
         return DATA[s_class].get(id)
 
     @classmethod
     def search(cls, attributes: dict = {}) -> List[TypeVar('Base')]:
-        """ Search all objects with matching attributes
+        """ Search all instances with matching attributes
+
+        Return a list of instances that match the given attributes
         """
         s_class = cls.__name__
         def _search(obj):
