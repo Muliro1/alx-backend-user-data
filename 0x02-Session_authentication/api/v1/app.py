@@ -28,7 +28,7 @@ if getenv('AUTH_TYPE') == 'basic_auth':
 @app.before_request
 def before_request() -> Optional[str]:
     """
-    
+
     """
     allowed_paths = ['/api/v1/status/', '/api/v1/unauthorized/',
                      '/api/v1/forbidden/']
@@ -41,25 +41,25 @@ def before_request() -> Optional[str]:
     if auth.current_user(request) is None:
         return abort(403)
     request.current_user = auth.current_user(request)
- 
+
 
 @app.errorhandler(404)
 def not_found(error) -> str:
-    """ Not found handler 
+    """ Not found handler
     """
     return jsonify({"error": "Not found"}), 404
 
 
 @app.errorhandler(401)
 def unauthorized(error) -> tuple[str, Literal[401]]:
-    """ Not found handler 
+    """ Not found handler
     """
     return jsonify({"error": "unauthorized"}), 401
 
 
 @app.errorhandler(403)
 def forbidden(error) -> tuple[str, Literal[403]]:
-    """ Not found handler 
+    """ Not found handler
     """
     return jsonify({"error": "Forbidden"}), 403
 
