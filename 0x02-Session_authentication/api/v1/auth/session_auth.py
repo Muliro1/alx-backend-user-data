@@ -5,6 +5,8 @@ Definition of class BasicAuth
 import base64
 from .auth import Auth
 from typing import TypeVar
+from uuid import uuid4
+import uuid
 
 from models.user import User
 
@@ -16,4 +18,11 @@ class SessionAuth(Auth):
     This protocol consists of the methods `current_user`, `extract_base64_authorization_header`,
     `decode_base64_authorization_header`, `extract_user_credentials` and `user_object_from_credentials`.
     """
-    pass
+    user_id_by_session_id = {}
+
+    def create_session(self, user_id: str = None):
+        if not user_id or not isinstance(user_id, str):
+            return
+        session_id = str(uuid.uuid4())
+        self.user_id_by_session_id[session_id] = user_id
+        return session_id
