@@ -34,22 +34,53 @@ elif AUTH_TYPE == "session_db_auth":
 
 
 @ app.errorhandler(404)
-def not_found(error) -> str:
-    """ Not found handler
+def not_found(error) -> tuple:
+    """ Handle 404 errors by returning a JSON response
+
+    Args:
+        error (flask.utils.RequestException): Exception instance
+
+    Returns:
+        tuple: A tuple containing a JSON response
+        and a 404 status code
     """
     return jsonify({"error": "Not found"}), 404
 
 
 @ app.errorhandler(401)
-def unauthorized_error(error) -> str:
-    """ Unauthorized handler
+def unauthorized_error(error) -> tuple:
+    """
+    Unauthorized handler
+
+    Args:
+        error (flask.utils.RequestException): Exception instance
+
+    Returns:
+        tuple: A tuple containing a JSON response and a 401 status code
+
+    Description:
+        This function is used to handle unauthorized errors.
+        It returns a JSON response with an "error"
+        key set to "Unauthorized"
+        and a 401 status code.
     """
     return jsonify({"error": "Unauthorized"}), 401
 
 
 @ app.errorhandler(403)
-def forbidden_error(error) -> str:
-    """ Forbidden handler
+def forbidden_error(error) -> tuple:
+    """Forbidden handler
+
+    This function is used to handle 403 errors.
+    It returns a JSON response with an "error"
+    key set to "Forbidden"
+    and a 403 status code.
+
+    Args:
+        error (flask.utils.RequestException): Exception instance
+
+    Returns:
+        tuple: A tuple containing a JSON response and a 403 status code
     """
     return jsonify({"error": "Forbidden"}), 403
 
@@ -57,7 +88,22 @@ def forbidden_error(error) -> str:
 @ app.before_request
 def before_request() -> str:
     """ Before Request Handler
-    Requests Validation
+
+    This function is called before each request.
+    It checks if the request is authorized (i.e., the
+    request has a valid authentication token or a valid
+    session cookie).
+
+    If the request is not authorized, it raises a 401
+    error. If the request is authorized, it sets the
+    `current_user` attribute of the request object to
+    the current user.
+
+    Args:
+        request (Request): The Flask request object
+
+    Returns:
+        str: None
     """
     if auth is None:
         return
