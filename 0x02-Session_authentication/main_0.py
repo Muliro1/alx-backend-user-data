@@ -1,28 +1,18 @@
 #!/usr/bin/env python3
-""" Main 1
+""" Cookie server
 """
-from api.v1.auth.session_auth import SessionAuth
+from flask import Flask, request
+from api.v1.auth.auth import Auth
 
-sa = SessionAuth()
+auth = Auth()
 
-print("{}: {}".format(type(sa.user_id_by_session_id), sa.user_id_by_session_id))
+app = Flask(__name__)
 
-user_id = None
-session = sa.create_session(user_id)
-print("{} => {}: {}".format(user_id, session, sa.user_id_by_session_id))
+@app.route('/', methods=['GET'], strict_slashes=False)
+def root_path():
+    """ Root path
+    """
+    return "Cookie value: {}\n".format(auth.session_cookie(request))
 
-user_id = 89
-session = sa.create_session(user_id)
-print("{} => {}: {}".format(user_id, session, sa.user_id_by_session_id))
-
-user_id = "abcde"
-session = sa.create_session(user_id)
-print("{} => {}: {}".format(user_id, session, sa.user_id_by_session_id))
-
-user_id = "fghij"
-session = sa.create_session(user_id)
-print("{} => {}: {}".format(user_id, session, sa.user_id_by_session_id))
-
-user_id = "abcde"
-session = sa.create_session(user_id)
-print("{} => {}: {}".format(user_id, session, sa.user_id_by_session_id))
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port="5000")
