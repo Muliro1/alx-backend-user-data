@@ -1,74 +1,72 @@
 #!/usr/bin/env python3
 """
-Definition of class Auth
+Module to manage the API authentication.
 """
-import os
 from flask import request
-from typing import (
-    List,
-    TypeVar
-)
+from typing import List, TypeVar
+
 
 
 class Auth:
     """
-    Manages the API authentication
+    manage the API authentication
     """
-    def __init__(self, excluded_paths: List[str]):
-        self.excluded_paths = set(excluded_paths)
 
-    def require_auth(self, path: str) -> bool:
+    def require_auth(self, path: str, excluded_paths: List[str]) -> bool:
         """
-        Determines whether a given path requires authentication or not.
+        Checks if authentication is required to access path.
+        /api/v1/status
 
-        Args:
-            path (str): Url path to be checked
-
-        Returns:
-            bool: True if path is not in excluded_paths, else False
+        /api/v1/stat*
+        ['/api/v1/stat', '']
         """
-        if path is None:
+        # be slash tolerant: path=/api/v1/status and path=/api/v1/status/
+        if path and not path.endswith('/'):
+            path = path + '/'
+        for excluded_path in excluded_paths:
+            if path.startswith(excluded_path.split('*')[0]):
+                return False
+
+        # Returns True if path is None
+        if not path or path not in excluded_paths:
             return True
-        for excluded_path in self.excluded_paths:
-            if path.startswith(excluded_path):
-                return False
-            if excluded_path.endswith("*") and path.startswith(excluded_path[:-1]):
-                return False
-        return True
-
-    def authorization_header(self, request: 'flask.Request') -> str:
+        # Returns True if excluded_paths is None or empty
+        if not excluded_paths or excluded_paths == []:
+            return True
+        # Returns False if path is in excluded_paths
+        if path in excluded_paths:
+            return False
+        # You can assume excluded_paths contains string path always ending by a /
+        return False
+        
+                
+    
+    def authorization_header(self, request=None) -> None:
         """
-        Returns the authorization header from a request object.
+        Checks for authorization header in request
 
-        Args:
-            request (flask.Request): Request object to be checked
-
-        Returns:
-            str: Value of the Authorization header from the request object
+        'Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ=='
         """
-        return request.headers.get('Authorization')
+        key = 'Authorization'
 
-    def current_user(self, request: 'flask.Request') -> TypeVar('User'):
+        if request is None or key not in request.headers:
+            return
+        return request.headers.get(key)
+    
+    def current_user(self, request=None) -> None:
         """
-        Returns a User instance from information from a request object.
-
-        Args:
-            request (flask.Request): Request object to be checked
-
-        Returns:
-            User: User instance from the request object
+        Only Returns None
         """
-        return None
+        return
 
-    def session_cookie(self, request: 'flask.Request') -> str:
-        """
-        Returns a cookie from a request.
 
-        Args:
-            request (flask.Request): Request object to be checked
+if __name__ == '__main__':
+    a = Auth()
 
-        Returns:
-            str: Value of the _my_session_id cookie from the request object
-        """
-        session_name = os.getenv('SESSION_NAME')
-        return request.cookies.get(session_name)
+    print(a.require_auth(None, None))  # True
+    print(a.require_auth(None, []))  # True
+    print(a.require_auth("/api/v1/status/", []))  # True
+    print(a.require_auth("/api/v1/status/", ["/api/v1/status/"]))  # False
+    print(a.require_auth("/api/v1/status", ["/api/v1/status/"]))  # False
+    print(a.require_auth("/api/v1/users", ["/api/v1/status/"]))  # True
+    print(a.require_auth("/api/v1/users", ["/api/v1/status/", "/api/v1/stats"]))  # True
