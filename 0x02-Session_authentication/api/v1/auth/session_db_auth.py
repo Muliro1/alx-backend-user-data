@@ -20,7 +20,8 @@ class SessionDBAuth(SessionExpAuth):
             user_id (str): user id
 
         Returns:
-            Session ID in string format or None if user_id is None or not a string
+            Session ID in string format or None if
+            user_id is None or not a string
         """
         session_id = super().create_session(user_id)
         if not session_id:
