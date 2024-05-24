@@ -31,7 +31,20 @@ if getenv('AUTH_TYPE') == 'session_auth':
 @app.before_request
 def before_request() -> Optional[str]:
     """
+    This function is called before every request and checks if the user
+    is authenticated or not.
 
+    The function first checks if there is an auth instance and if the
+    current request path is protected or not. If the path is protected
+    and the user is not authenticated, it will return a 401 status
+    code. If the user is not authenticated, it will return a 403 status
+    code.
+
+    Args:
+        request (flask.Request): Current request object
+
+    Returns:
+        str: None if the user is authenticated, otherwise the error message
     """
     allowed_paths = ['/api/v1/status/', '/api/v1/unauthorized/',
                      '/api/v1/forbidden/']
@@ -47,22 +60,48 @@ def before_request() -> Optional[str]:
 
 
 @app.errorhandler(404)
-def not_found(error) -> str:
-    """ Not found handler
+def not_found(error) -> tuple[str, Literal[404]]:
+    """
+    Not found handler
+
+    Returns:
+        tuple[str, int]: JSON with error message and a 404 status code
     """
     return jsonify({"error": "Not found"}), 404
 
 
 @app.errorhandler(401)
 def unauthorized(error) -> tuple[str, Literal[401]]:
-    """ Not found handler
+    """
+    Unauthorized handler
+
+    Returns:
+        tuple[str, int]: JSON with error message and a 401 status code
+    """
+    """
+    This function is called when an unauthenticated user tries to access
+    a protected resource. It returns a JSON with an error message and
+    a 401 status code.
+
+    The error message is a string with the value "unauthorized".
     """
     return jsonify({"error": "unauthorized"}), 401
 
 
 @app.errorhandler(403)
 def forbidden(error) -> tuple[str, Literal[403]]:
-    """ Not found handler
+    """
+    Forbidden handler
+
+    Returns:
+        tuple[str, int]: JSON with error message and a 403 status code
+    """
+    """
+    This function is called when a user tries to access a protected
+    resource without being authenticated. It returns a JSON with an
+    error message and a 403 status code.
+
+    The error message is a string with the value "Forbidden".
     """
     return jsonify({"error": "Forbidden"}), 403
 
