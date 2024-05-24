@@ -2,111 +2,86 @@
 """
 Route module for the API
 """
-from os import getenv
 from api.v1.views import app_views
 from flask import Flask, jsonify, abort, request
 from flask_cors import (CORS, cross_origin)
 import os
-from typing import Literal, Optional
+from os import getenv
 
 
 app = Flask(__name__)
+app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 app.register_blueprint(app_views)
 CORS(app, resources={r"/api/v1/*": {"origins": "*"}})
-
 auth = None
+AUTH_TYPE = getenv("AUTH_TYPE")
 
-if getenv('AUTH_TYPE') == 'auth':
+if AUTH_TYPE == "auth":
     from api.v1.auth.auth import Auth
     auth = Auth()
-
-if getenv('AUTH_TYPE') == 'basic_auth':
+elif AUTH_TYPE == "basic_auth":
     from api.v1.auth.basic_auth import BasicAuth
     auth = BasicAuth()
-if getenv('AUTH_TYPE') == 'session_auth':
+elif AUTH_TYPE == "session_auth":
     from api.v1.auth.session_auth import SessionAuth
     auth = SessionAuth()
+elif AUTH_TYPE == "session_exp_auth":
+    from api.v1.auth.session_exp_auth import SessionExpAuth
+    auth = SessionExpAuth()
+elif AUTH_TYPE == "session_db_auth":
+    from api.v1.auth.session_db_auth import SessionDBAuth
+    auth = SessionDBAuth()
 
 
-@app.before_request
-def before_request() -> Optional[str]:
-    """
-    This function is called before every request and checks if the user
-    is authenticated or not.
-
-    The function first checks if there is an auth instance and if the
-    current request path is protected or not. If the path is protected
-    and the user is not authenticated, it will return a 401 status
-    code. If the user is not authenticated, it will return a 403 status
-    code.
-
-    Args:
-        request (flask.Request): Current request object
-
-    Returns:
-        str: None if the user is authenticated, otherwise the error message
-    """
-    allowed_paths = ['/api/v1/status/', '/api/v1/unauthorized/',
-                     '/api/v1/forbidden/']
-    if auth is None:
-        return
-    if not auth.require_auth(request.path, allowed_paths):
-        return
-    if auth.authorization_header(request) is None:
-        abort(401)
-    if auth.current_user(request) is None:
-        return abort(403)
-    request.current_user = auth.current_user(request)
-
-
-@app.errorhandler(404)
-def not_found(error) -> tuple[str, Literal[404]]:
-    """
-    Not found handler
-
-    Returns:
-        tuple[str, int]: JSON with error message and a 404 status code
+@ app.errorhandler(404)
+def not_found(error) -> str:
+    """ Not found handler
     """
     return jsonify({"error": "Not found"}), 404
 
 
-@app.errorhandler(401)
-def unauthorized(error) -> tuple[str, Literal[401]]:
+@ app.errorhandler(401)
+def unauthorized_error(error) -> str:
+    """ Unauthorized handler
     """
-    Unauthorized handler
-
-    Returns:
-        tuple[str, int]: JSON with error message and a 401 status code
-    """
-    """
-    This function is called when an unauthenticated user tries to access
-    a protected resource. It returns a JSON with an error message and
-    a 401 status code.
-
-    The error message is a string with the value "unauthorized".
-    """
-    return jsonify({"error": "unauthorized"}), 401
+    return jsonify({"error": "Unauthorized"}), 401
 
 
-@app.errorhandler(403)
-def forbidden(error) -> tuple[str, Literal[403]]:
-    """
-    Forbidden handler
-
-    Returns:
-        tuple[str, int]: JSON with error message and a 403 status code
-    """
-    """
-    This function is called when a user tries to access a protected
-    resource without being authenticated. It returns a JSON with an
-    error message and a 403 status code.
-
-    The error message is a string with the value "Forbidden".
+@ app.errorhandler(403)
+def forbidden_error(error) -> str:
+    """ Forbidden handler
     """
     return jsonify({"error": "Forbidden"}), 403
+
+
+@ app.before_request
+def before_request() -> str:
+    """ Before Request Handler
+    Requests Validation
+    """
+    if auth is None:
+        return
+
+    excluded_paths = ['/api/v1/status/',
+                      '/api/v1/unauthorized/',
+                      '/api/v1/forbidden/',
+                      '/api/v1/auth_session/login/']
+
+    if not auth.require_auth(request.path, excluded_paths):
+        return
+
+    if auth.authorization_header(request) is None \
+            and auth.session_cookie(request) is None:
+        abort(401)
+
+    current_user = auth.current_user(request)
+    if current_user is None:
+        abort(403)
+
+    request.current_user = current_user
 
 
 if __name__ == "__main__":
     host = getenv("API_HOST", "0.0.0.0")
     port = getenv("API_PORT", "5000")
-    app.run(debug=True, host=host, port=port)
+    app.run(host=host, port=port)
