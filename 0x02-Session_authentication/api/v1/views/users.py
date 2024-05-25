@@ -9,8 +9,12 @@ from models.user import User
 @app_views.route('/users', methods=['GET'], strict_slashes=False)
 def view_all_users() -> str:
     """ GET /api/v1/users
-    Return:
-      - list of all User objects JSON represented
+    Return a JSON representation of all the Users in the database.
+
+    The function returns a list of dictionaries, each containing the
+    attributes of a User. The list is obtained by calling the
+    to_json() method on each User object in the User.all() list
+    and then using the list comprehension to create the final list.
     """
     all_users = [user.to_json() for user in User.all()]
     return jsonify(all_users)
@@ -19,24 +23,37 @@ def view_all_users() -> str:
 @app_views.route('/users/<user_id>', methods=['GET'], strict_slashes=False)
 def view_one_user(user_id: str = None) -> str:
     """ GET /api/v1/users/:id
+
     Path parameter:
       - User ID
+
     Return:
       - User object JSON represented
       - 404 if the User ID doesn't exist
     """
+    # If user_id is None, abort with 404
     if user_id is None:
         abort(404)
-    if user_id == "me":
-        if request.current_user is None:
-            abort(404)
-        user = request.current_user
-        return jsonify(user.to_json())
+
+    # If request is for the current user and
+    # request.current_user is None, abort with 404
+    if user_id == "me" and request.current_user is None:
+        abort(404)
+
+    # If request is for the current user and
+    # request.current_user is not None, return
+    # JSON representation of the current user
+    if user_id == "me" and request.current_user is not None:
+        return jsonify(request.current_user.to_json())
+
+    # Get the User with the given user_id
     user = User.get(user_id)
+
+    # If User is None, abort with 404
     if user is None:
         abort(404)
-    if request.current_user is None:
-        abort(404)
+
+    # Return JSON representation of the User
     return jsonify(user.to_json())
 
 
